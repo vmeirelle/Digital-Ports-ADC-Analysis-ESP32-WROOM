@@ -1,0 +1,24 @@
+#define GPIO_BOTAO 5
+#define BOUNCE 10
+ 
+int CONT = 0;
+unsigned long TIME_LAST = 0;
+
+void IRAM_ATTR funcao_ISR(){
+if ( (millis() - TIME_LAST) >= BOUNCE ){
+CONT++;
+TIME_LAST = millis();
+}}
+ 
+ 
+void setup(){
+Serial.begin(115200);
+pinMode(GPIO_BOTAO, INPUT);
+attachInterrupt(GPIO_BOTAO, funcao_ISR, RISING);
+}
+ 
+void loop(){
+Serial.print("Acionamentos: ");
+Serial.println(CONT);
+delay(1000);
+}

@@ -1,0 +1,31 @@
+volatile unsigned long pulse_count = 0;
+unsigned long last_interrupt_time = 0;
+
+#define PIN_USING 5
+
+void countPulse() {
+  unsigned long interrupt_time = millis();
+  if (interrupt_time - last_interrupt_time > 10) { // debounce the input
+    pulse_count++;
+    last_interrupt_time = interrupt_time;
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(PIN_USING, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PIN_USING), countPulse, RISING);
+}
+
+void loop() {
+  unsigned long interval = millis() - last_interrupt_time;
+  if (interval > 1000) { // print the frequency every second
+    unsigned long pulse_count_copy = pulse_count;
+    pulse_count = 0;
+    float frequency = (pulse_count_copy / 2.0) * (1000.0 / interval);
+    Serial.print("Frequency: ");
+    Serial.print(frequency);
+    Serial.println(" Hz");
+    last_interrupt_time = millis();
+  }
+}

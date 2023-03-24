@@ -1,0 +1,57 @@
+#include <Wire.h> // Enable this line if using Arduino Uno, Mega, etc.
+#include <Adafruit_GFX.h>
+#include "Adafruit_LEDBackpack.h"
+
+Adafruit_7segment matrix = Adafruit_7segment();
+
+// #define SCL_INDEX 0x00
+// #define SCL_TIME 0x01
+// #define SCL_FREQUENCY 0x02
+// #define SCL_PLOT 0x03
+
+volatile bool FLAG = true;
+
+#define LED 2
+hw_timer_t *My_timer = NULL;
+#define GPIO_BOTAO 5
+
+void IRAM_ATTR onTimer() {
+  FLAG = false;
+  digitalWrite(LED, !digitalRead(LED));
+}
+
+void wait_for_interrupt(){
+  while(true){
+    delay(1);
+    if(FLAG==false){
+      FLAG = true;
+      break;
+    }
+  }
+} 
+
+void toDisplay(int x){
+  matrix.print((x)); 
+  matrix.writeDisplay();
+}
+
+void setup() {
+  Serial.begin(115200);
+  matrix.begin(0x70);
+  pinMode(GPIO_BOTAO, INPUT);
+  pinMode(LED, OUTPUT);
+  My_timer = timerBegin(0, 80, true);
+  timerAttachInterrupt(My_timer, &onTimer, true);
+  timerAlarmWrite(My_timer, 65000, true);
+  timerAlarmEnable(My_timer);  //Just Enable
+}
+void loop() {     
+    int a = 0; 
+    while(true){
+    wait_for_interrupt();           //verificação
+    a = a + 1;
+    Serial.println(digitalRead(GPIO_BOTAO));
+    while(digitalRead(GPIO_BOTAO)==0){
+      toDisplay(a);                //12ms
+    }
+}}

@@ -203,7 +203,7 @@ while(1) {
 
 ### 3 Parte 3 - Coleta de forma onda.
 
-O programa então foi configurado para fazer 1000 leituras do ADC em um segundo (taxa de amostragem de 1kHz), armazenando os valores em um vetor.
+Foi utiizado então o resultado das partes 1 e 2 para gerar um novo programa, conforme anexo do reposítorio. O programa então foi configurado para fazer 1000 leituras do ADC em um segundo (taxa de amostragem de 1kHz), armazenando os valores em um vetor.
 Em seguida, o programa deve parou a coleta. Os dados coletados foram plotados pela serial separados por virgula, sem quebra de linha. Então copiados e colocados script python para plotar o resultado. O gráfico consiste em leitura de 1 a 1000 pelo valor de leitura. O procedimento foi feito colocando como entrada uma onda senoidal, uma onda quadrada e uma onda dente de serra, todas de 100 Hz, uma de cada vez.
 
 ### Senoidal

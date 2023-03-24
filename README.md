@@ -17,7 +17,7 @@ A corrente máxima das portas de saída do ESP-32 wroom é de cerca de 12mA..
 ### 1 Parte 3 - Frequência máxima:
 
 De acordo com as especificações do fabricante, a frequência máxima de saída das portas digitais do ESP-32 wroom é de 40MHz.
-A frequência máxima de entrada nas portas do ESP-32 wroom dependerá do circuito externo conectado a elas e da capacidade desse circuito em responder às mudanças de sinal. Portanto, não há uma frequência máxima definida para as portas de entrada.
+A frequência máxima de entrada nas portas do ESP-32 wroom dependerá do circuito externo conectado a elas e da capacidade desse circuito em responder às mudanças de sinal.
 
 ```C
 
@@ -39,7 +39,7 @@ void loop(){
 ```
 ![image](https://user-images.githubusercontent.com/50549048/227588903-1693bc1f-202a-452a-a762-17efb9bc650f.png)
 
-Segundo imagem, foi conseguido testar até 1.356Mhz, inserindo um código de loop com o intuito de colocar uma saída como alta e baixa repetidamente e então analisada pelo osciloscópio. 
+Segundo imagem, foi conseguido testar até 1.356Mhz, inserindo um código de loop com o intuito de colocar uma saída como alta e baixa repetidamente e então analisada pelo osciloscópio. Isso pode se dar pela implementação de bibliotecas de arduino e de um código não otimizado. 
 ### Referências:
 
 Datasheet do ESP-32 wroom: https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32d_esp32-wroom-32u_datasheet_en.pdf
@@ -131,6 +131,86 @@ E o valor obtido via terminal se aproximou do esperado, sendo de 0.94Mhz.
 
 ## 3 - Temporizadores e Conversão A/D
 
-### 2 Parte 1 - Interrupção básica
+### 3 Parte 1 - Temporizador básico
+ Ainda utilizando do módulo de interrupção implementado na parte anterior foi implementa as funções capazes de gerar uma interrupção. 
+
+```C
+
+hw_timer_t *My_timer = NULL;
+volatile bool FLAG = true;
+
+void IRAM_ATTR onTimer() {
+  FLAG = false;
+  digitalWrite(LED, !digitalRead(LED));
+}
+
+void wait_for_interrupt(){
+  while(true){
+    delay(1);
+    if(FLAG==false){
+      FLAG = true;
+      break;
+    }
+  }
+}
+
+void setup() {
+  pinMode(LED, OUTPUT);
+  My_timer = timerBegin(0, 80, true);
+  timerAttachInterrupt(My_timer, &onTimer, true);
+  timerAlarmWrite(My_timer, 10000000, true);
+  timerAlarmEnable(My_timer);  //Just Enable
+
+} 
 
 
+void loop() {
+while(1) {
+  wait_for_interrupt();  
+ }
+```
+
+### 3 Parte 2 - Conversão analógica digital
+
+Em seguida foi implementado a parte responsavél por ler um sinal analógico usando o ADC do ESP32.
+
+```C
+#include <driver/adc.h>
+
+int values[1000];
+int valores[1000];
+
+int16_t getValue(){
+    int value = analogRead(4);
+    return value;
+}
+
+void setup() {
+  Serial.begin(115200);
+  adc1_config_width(ADC_WIDTH_12Bit);
+  adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_0db);
+
+}
+
+void loop() {
+ int adc1_get_voltage(adc1_channel_t channel);
+while(1) {
+  for(int i = 0; i<1000; i++){
+    valores[i] = getValue();
+  }
+
+```
+
+### 3 Parte 3 - Coleta de forma onda.
+
+O programa então foi configurado para fazer 1000 leituras do ADC em um segundo (taxa de amostragem de 1kHz), armazenando os valores em um vetor.
+Em seguida, o programa deve parou a coleta. Os dados coletados foram plotados pela serial separados por virgula, sem quebra de linha. Então copiados e colocados script python para plotar o resultado. O gráfico consiste em leitura de 1 a 1000 pelo valor de leitura. O procedimento foi feito colocando como entrada uma onda senoidal, uma onda quadrada e uma onda dente de serra, todas de 100 Hz, uma de cada vez.
+
+### Senoidal
+![senoide](https://user-images.githubusercontent.com/50549048/227599363-45729e0e-71f7-4c4d-b53f-a96f4d4d6671.png)
+
+### Serrote
+![rampa](https://user-images.githubusercontent.com/50549048/227599375-818147fd-a4b8-46fd-b486-ee8aecbb2186.png)
+
+### Quadrada
+![quadrada](https://user-images.githubusercontent.com/50549048/227599390-10b6829b-36bc-4858-9542-8136a764e294.png)

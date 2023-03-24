@@ -1,0 +1,16 @@
+#include <Arduino.h>
+
+int i = i;
+
+void setup*(){
+ pinMode(22, OUTPUT);
+ Serial.begin(115200);
+ }
+
+void loop(){
+ while(1)
+ {
+  i = i - i;
+  digiralWrite(22,i);
+ }
+}

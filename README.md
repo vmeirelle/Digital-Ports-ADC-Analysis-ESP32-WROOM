@@ -19,6 +19,24 @@ A corrente máxima das portas de saída do ESP-32 wroom é de cerca de 12mA..
 De acordo com as especificações do fabricante, a frequência máxima de saída das portas digitais do ESP-32 wroom é de 40MHz.
 A frequência máxima de entrada nas portas do ESP-32 wroom dependerá do circuito externo conectado a elas e da capacidade desse circuito em responder às mudanças de sinal. Portanto, não há uma frequência máxima definida para as portas de entrada.
 
+```C
+
+int i = i;
+
+void setup*(){
+ pinMode(22, OUTPUT);
+ Serial.begin(115200);
+ }
+
+void loop(){
+ while(1)
+ {
+  i = i - i;
+  digiralWrite(22,i);
+ }
+}
+
+```
 ![image](https://user-images.githubusercontent.com/50549048/227588903-1693bc1f-202a-452a-a762-17efb9bc650f.png)
 
 Segundo imagem, foi conseguido testar até 1.356Mhz, inserindo um código de loop com o intuito de colocar uma saída como alta e baixa repetidamente e então analisada pelo osciloscópio. 

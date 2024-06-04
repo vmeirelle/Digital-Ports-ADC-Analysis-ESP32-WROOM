@@ -1,4 +1,4 @@
-# Lab 02 - Estudos do ESP-32 WROOM.
+# ESP-32 WROOM.
 
 ## Objetivo
 
